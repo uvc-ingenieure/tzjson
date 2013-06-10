@@ -76,4 +76,67 @@ a optionally length parameter can be passed to those functions:
     int len;
     tzj_str(json, ".method", &str, &len);
 
+To ease the creation of JSON strings,  a ``sprintf(...)`` like function is
+provided. In the format string all single quotes are replaced by double quotes
+to avoid heavy escaping.
+The following formats are recognized by ``tzj_sprintf(...)``:
+
+:%s:
+    Strings, containing double quotes will be escaped
+:%d:
+    Decimal as usual
+:%j:
+    JSON parts maybe previously extracted with ``tzj_json(...)``
+    This format expects the ``char*`` to the JSON and an ``int`` providing the
+    length of the JSON
+
+.. code-block:: c
+
+    char buf[64];
+    const char *sub;
+    int len;
+
+    tzj_json(json, ".params", &sub, &len);
+    tzj_sprintf(buf, "{'key': %d, 'sub': %j}", 85, sub, len);
+
+
+
+================
+JSON RPC Example
+================
+
+To show all parts working together, here is an real life example.
+Parsing and responding to a JSON RPC request:
+
+.. code-block:: c
+
+    const char *request = "{\"jsonrpc\": \"2.0\", "
+        "\"method\": \"subtract\", "
+        "\"params\": [42, 23], \"id\": \"unknown type\"}";
+    char response[128];
+    const char *version;
+    const char *id;
+    int len;
+    int a, b;
+
+    printf("RPC Request: %s\n", request);
+
+    if (tzj_str(request, ".jsonrpc", &version, &len)
+        && strncmp(version, "2.0", len) == 0
+        && tzj_json(request, ".id", &id, &len)
+        && tzj_int(request, ".params[0]", &a)
+        && tzj_int(request, ".params[1]", &b)) {
+
+        tzj_sprintf(response, "{'jsonrpc': '2.0', 'result': %d, 'id': %j}",
+                    a - b, id, len);
+
+    } else {
+        fprintf(stderr, "ERROR: failed to parse request\n");
+        tzj_sprintf(response, "{'jsonrpc': '2.0', "
+                    "'error': {'code': -32700, 'message': 'Parse error'}, "
+                    "'id': null}");
+    }
+
+    printf("RPC Response: %s\n", response);
+
 .. footer:: Copyright (c) UVC Ingenieure http://uvc-ingenieure.de/

@@ -34,4 +34,6 @@ bool tzj_int(const char *json, char *path, int *value);
 bool tzj_double(const char *json, char *path, double *value);
 bool tzj_bool(const char *json, char *path, bool *value);
 
+int tzj_sprintf(char *str, const char *fmt, ...);
+
 #endif	/* __TZJSON_H_ */

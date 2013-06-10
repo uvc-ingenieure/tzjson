@@ -416,3 +416,60 @@ bool tzj_bool(const char *json, char *path, bool *value)
 
     return false;
 }
+
+int tzj_sprintf(char *str, const char *fmt, ...)
+{
+    va_list args;
+    int i;
+    int len;
+    char *dst = str;
+    char *s;
+
+    va_start(args, fmt);
+
+    for(; *fmt != '\0'; fmt++) {
+        if(*fmt != '%') {
+            if (*fmt == '\'') {
+                *dst++ = '"';
+            } else {
+                *dst++ = *fmt;
+            }
+        } else {
+            switch(*++fmt) {
+            case 'c':
+                *dst++ = (char)va_arg(args, int);;
+                break;
+
+            case 'd':
+                dst += sprintf(dst, "%d", va_arg(args, int));
+                break;
+
+            case 's':
+                s = va_arg(args, char*);
+                while (*s != '\0') {
+                    if (*s == '"') {
+                        *dst++ = '\\';
+                    }
+                    *dst++ = *s++;
+                }
+                break;
+
+            case 'j':
+                s = va_arg(args, char*);
+                len = va_arg(args, int);
+                strncpy(dst, s, len);
+                dst += len;
+                break;
+
+            case '%':
+                *dst++ = '%';
+                break;
+            }
+        }
+    }
+    va_end(args);
+
+    *dst = '\0';
+
+    return dst - str;
+}
