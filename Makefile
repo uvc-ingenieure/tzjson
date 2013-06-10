@@ -4,7 +4,7 @@ libtzjson.a: tzjson.o
 	$(AR) rc $@ $^
 
 %.o: %.c tzjson.h
-	$(CC) -c $(CFLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) -Wall -Wextra $< -o $@
 
 test: tzjson_test
 	./tzjson_test

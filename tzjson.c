@@ -215,12 +215,10 @@ static enum tzj_result tzj_parse_value(struct tzj_context *tzj)
     if (tzj->path_segment_type == TZJ_DONE)
         return TZJ_FOUND;
 
-    if (*tzj->pos >= '0' && *tzj->pos <= '9' || *tzj->pos == '-') {
+    if ((*tzj->pos >= '0' && *tzj->pos <= '9') || (*tzj->pos == '-')) {
         return tzj_parse_number(tzj);
     } else {
         switch (*tzj->pos) {
-        case -1:
-            return TZJ_ERROR;
         case '{':
             return tzj_parse_object(tzj);
         case '[':
@@ -418,7 +416,6 @@ bool tzj_bool(const char *json, char *path, bool *value)
 
 int tzj_vsprintf(char *str, const char *fmt, va_list args)
 {
-    int i;
     int len;
     char *dst = str;
     char *s;
