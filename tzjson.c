@@ -23,7 +23,6 @@
  * THE SOFTWARE.
  */
 
-#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -417,15 +416,12 @@ bool tzj_bool(const char *json, char *path, bool *value)
     return false;
 }
 
-int tzj_sprintf(char *str, const char *fmt, ...)
+int tzj_vsprintf(char *str, const char *fmt, va_list args)
 {
-    va_list args;
     int i;
     int len;
     char *dst = str;
     char *s;
-
-    va_start(args, fmt);
 
     for(; *fmt != '\0'; fmt++) {
         if(*fmt != '%') {
@@ -467,9 +463,18 @@ int tzj_sprintf(char *str, const char *fmt, ...)
             }
         }
     }
-    va_end(args);
 
     *dst = '\0';
 
     return dst - str;
+}
+
+int tzj_sprintf(char *str, const char *fmt, ...)
+{
+    int ret;
+    va_list args;
+    va_start(args, fmt);
+    ret = tzj_vsprintf(str, fmt, args);
+    va_end(args);
+    return ret;
 }

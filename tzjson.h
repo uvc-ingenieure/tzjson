@@ -26,6 +26,7 @@
 #ifndef __TZJSON_H_
 #define __TZJSON_H_
 
+#include <stdarg.h>
 #include <stdbool.h>
 
 bool tzj_json(const char *json, char *path, const char **res, int *len);
@@ -34,6 +35,7 @@ bool tzj_int(const char *json, char *path, int *value);
 bool tzj_double(const char *json, char *path, double *value);
 bool tzj_bool(const char *json, char *path, bool *value);
 
+int tzj_vsprintf(char *str, const char *fmt, va_list args);
 int tzj_sprintf(char *str, const char *fmt, ...);
 
 #endif	/* __TZJSON_H_ */
