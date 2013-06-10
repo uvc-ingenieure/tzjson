@@ -109,7 +109,11 @@ static enum tzj_result tzj_parse_object(struct tzj_context *tzj)
     switch (*tzj->pos) {
     case '"':
         ret = tzj_parse_pair(tzj);
-        tzj_next(tzj, true);
+
+        /* do not advance if path has been matched */
+        if (ret == TZJ_OK) {
+            tzj_next(tzj, true);
+        }
     case '}':
         break;
     default:
@@ -401,7 +405,6 @@ bool tzj_bool(const char *json, char *path, bool *value)
     struct tzj_context tzj;
 
     if (tzj_parse(&tzj, json, path) == TZJ_FOUND) {
-        tzj.pos--;
 
 	if (strncmp(tzj.pos, TZJ_CONST_TRUE, strlen(TZJ_CONST_TRUE)) != 0
 	    && strncmp(tzj.pos, TZJ_CONST_FALSE, strlen(TZJ_CONST_FALSE)) != 0)
