@@ -63,7 +63,7 @@ The parsing overhead can be reduced with JSON sub strings which
 
     char *sub;
     tzj_json(json, ".params", &sub, NULL);
-    tzj_int(json, "[1].key", &intarg);
+    tzj_int(sub, "[1].key", &intarg);
 
 
 The string related functions ``tzj_json(...)`` and ``tzj_str(...)`` return
