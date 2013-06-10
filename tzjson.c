@@ -171,7 +171,8 @@ static enum tzj_result tzj_parse_array(struct tzj_context *tzj)
             ret = tzj_parse_value(tzj);
         }
 
-        tzj_next(tzj, true);
+        if (ret == TZJ_OK)
+            tzj_next(tzj, true);
     }
 
     while (ret == TZJ_OK && *tzj->pos != ']') {
@@ -191,9 +192,8 @@ static enum tzj_result tzj_parse_array(struct tzj_context *tzj)
             }
 
             /* do not advance if path has been matched */
-            if (ret == TZJ_OK) {
+            if (ret == TZJ_OK)
                 tzj_next(tzj, true);
-            }
 
         } else {
             fprintf(stderr, "ERROR: failed to parse array value.\n");
