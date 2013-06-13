@@ -25,6 +25,7 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "tzjson.h"
 
@@ -62,12 +63,16 @@ static void tzj_rpc_example(void)
 
 int main(int argc, char *argv[])
 {
-    char buf[64];
+    enum tzj_type type;
     const char *sub;
     const char *strarg;
     bool boolarg;
     int intarg;
     int len;
+    int i;
+
+    (void)argc;
+    (void)argv;
 
     char *json = "{\"jsonrpc\": \"2.0\","
                   "\"number\": -32.123,"
@@ -76,7 +81,7 @@ int main(int argc, char *argv[])
                   "\"id\": 1}";
 
 
-    assert(tzj_json(json, ".params", &sub, NULL));
+    assert(tzj_json(json, ".params", &sub, NULL) != TZJ_ERROR);
 
     printf("testing tzj_int(...)\n");
     intarg = 0;
@@ -104,6 +109,33 @@ int main(int argc, char *argv[])
 
     assert(tzj_str(json, ".method", &strarg, &len));
     assert(strncmp(strarg, "subtract", len) == 0);
+
+    printf("testing tzj_array_next(...)\n");
+
+    json = "{\"array\": [5, \"value\", [1, true, 3]]}";
+
+    i = 0;
+    for (i = 0, type = tzj_json(json, ".array[0]", &sub, NULL);
+         type != TZJ_ERROR;
+         type = tzj_array_next(&sub), i++) {
+        switch (i) {
+        case 0:
+            assert(type == TZJ_NUMBER
+                   && tzj_int(sub, "", &intarg)
+                   && intarg == 5);
+            break;
+        case 1:
+            assert(type == TZJ_STRING
+                   && tzj_str(sub, "", &strarg, &len)
+                   && strncmp(strarg, "value", len) == 0);
+            break;
+        case 2:
+            assert(type == TZJ_ARRAY);
+            break;
+        default:
+            assert(false);
+        }
+    }
 
     printf("\nall tests passed\n");
 

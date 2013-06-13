@@ -29,7 +29,19 @@
 #include <stdarg.h>
 #include <stdbool.h>
 
-bool tzj_json(const char *json, char *path, const char **res, int *len);
+enum tzj_type {
+    TZJ_ARRAY,
+    TZJ_OBJECT,
+    TZJ_NUMBER,
+    TZJ_STRING,
+    TZJ_TRUE,
+    TZJ_FALSE,
+    TZJ_NULL,
+    TZJ_ERROR
+};
+
+enum tzj_type tzj_json(const char *json, char *path, const char **res, int *len);
+enum tzj_type tzj_array_next(const char **next);
 bool tzj_str(const char *json, char *path, const char **res, int *len);
 bool tzj_int(const char *json, char *path, int *value);
 bool tzj_double(const char *json, char *path, double *value);
@@ -38,4 +50,4 @@ bool tzj_bool(const char *json, char *path, bool *value);
 int tzj_vsprintf(char *str, const char *fmt, va_list args);
 int tzj_sprintf(char *str, const char *fmt, ...);
 
-#endif	/* __TZJSON_H_ */
+#endif  /* __TZJSON_H_ */

@@ -26,7 +26,7 @@ JSON input string but without modifying it:
 
 .. code-block:: c
 
-    bool tzj_json(const char *json, char *path, const char **res, int *len);
+    enum tzj_type tzj_json(const char *json, char *path, const char **res, int *len);
     bool tzj_str(const char *json, char *path, const char **res, int *len);
     bool tzj_int(const char *json, char *path, int *value);
     bool tzj_double(const char *json, char *path, double *value);
@@ -68,13 +68,30 @@ The parsing overhead can be reduced with JSON sub strings which
 
 The string related functions ``tzj_json(...)`` and ``tzj_str(...)`` return
 references into the input string and thus aren't null terminated. Instead,
-a optionally length parameter can be passed to those functions:
+a optionally length parameter can be passed to those functions.
+For further handlinf the object type ``enum tzj_type`` is returned.
 
 .. code-block:: c
 
     char *str;
     int len;
     tzj_str(json, ".method", &str, &len);
+
+To iterate over arrays, ``tzj_array_next(...)`` advances a pointer to the next
+array item:
+
+.. code-block:: c
+
+    enum tzj_type type;
+    const char *elem;
+
+    for (type = tzj_json(json, ".params[0]", &elem, NULL);
+         type != TZJ_ERROR;
+         type = tzj_array_next(&elem)) {
+
+	 handle_element(elem);
+    }
+
 
 To ease the creation of JSON strings,  a ``sprintf(...)`` like function is
 provided. In the format string all single quotes are replaced by double quotes
